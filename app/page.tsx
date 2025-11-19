@@ -23,6 +23,9 @@ export default function Home() {
   // ------------------------------------
   // MICROPHONE
   // ------------------------------------
+  // Inside Home component
+  const [candleLit, setCandleLit] = useState(true);
+
   useEffect(() => {
     async function setupMic() {
       try {
@@ -39,6 +42,13 @@ export default function Home() {
           analyser.getByteFrequencyData(dataArray);
           const avg = dataArray.reduce((a, b) => a + b) / dataArray.length;
           setVolume(avg);
+
+          // Detect blow
+          if (avg > 30) { // threshold for blowing
+            setCandleLit(false);
+            setTimeout(() => setCandleLit(true), 2000); // relight after 2s
+          }
+
           requestAnimationFrame(loop);
         }
         loop();
@@ -48,6 +58,7 @@ export default function Home() {
     }
     setupMic();
   }, []);
+
 
   // ------------------------------------
   // RENDER
@@ -120,7 +131,7 @@ export default function Home() {
 
           {/* Bottom Hint */}
           <motion.div
-            className="absolute bottom-10 text-sm text-gray-600"
+            className="absolute bottom-32 text-sm text-gray-600"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2 }}
@@ -161,7 +172,7 @@ export default function Home() {
         </div>
 
         <motion.div
-          className="absolute bottom-10 text-sm text-gray-600"
+          className="absolute bottom-32 text-sm text-gray-600"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
@@ -186,9 +197,9 @@ export default function Home() {
             <div className="absolute top-[-140px] left-1/2 -translate-x-1/2 flex flex-col items-center">
               <motion.div
                 animate={
-                  volume > 60
-                    ? { opacity: 0, scale: 0.2, y: 20 }
-                    : { opacity: 1, scale: 1, y: [0, -4, 0], rotate: [0, -3, 3, 0] }
+                  !candleLit || volume > 60
+                    ? { opacity: 0, scale: 0.2, y: 20 }  // Lilin mati
+                    : { opacity: 1, scale: 1, y: [0, -4, 0], rotate: [0, -3, 3, 0] } // Lilin hidup
                 }
                 transition={{ duration: 0.25 }}
               >
@@ -219,15 +230,18 @@ export default function Home() {
                     transition={{ duration: 1.2, repeat: Infinity }}
                   />
 
-                  {/* Main flame */}
                   <motion.path
                     d="M50 20 C62 56 82 70 50 120 C18 70 38 56 50 20 Z"
                     fill="url(#cakeFlame)"
-                    animate={{
-                      scale: 1 - Math.min(volume / 220, 0.6),
-                      opacity: 1 - Math.min(volume / 180, 0.5),
-                      rotate: volume > 30 ? [0, -12, 12, 0] : [0, -3, 3, 0],
-                    }}
+                    animate={
+                      candleLit
+                        ? {
+                          scale: 1 - Math.min(volume / 220, 0.6),
+                          opacity: 1 - Math.min(volume / 180, 0.5),
+                          rotate: volume > 30 ? [0, -12, 12, 0] : [0, -3, 3, 0],
+                        }
+                        : { opacity: 0, scale: 0.2, y: 20 } // blown out
+                    }
                     transition={{ duration: 0.15 }}
                   />
 
