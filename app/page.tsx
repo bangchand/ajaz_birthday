@@ -82,7 +82,7 @@ export default function Home() {
       {pages.map((text, idx) => (
         <motion.div
           key={idx}
-          className="h-screen snap-start relative flex flex-col justify-center items-center px-8 text-center overflow-hidden bg-gradient-to-br from-pink-50 via-white to-blue-50"
+          className="h-screen snap-start relative flex flex-col justify-center items-center px-8 text-center overflow-hidden bg-gradient-to-br from-pink-50 via-white to-blue-50 pb-56"
           viewport={{ amount: 0.3 }}
           onViewportEnter={() => {
             if (idx === 3) {
